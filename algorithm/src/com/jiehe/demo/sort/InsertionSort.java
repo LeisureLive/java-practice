@@ -3,7 +3,8 @@ package com.jiehe.demo.sort;
 import java.util.Arrays;
 
 /**
- * 插入排序.
+ * 插入排序,时间复杂度N~N^2,空间复杂度1.
+ * <p>每次都将当前元素插入到左侧已经排序的数组中，使得插入之后左侧数组依然有序。</p>
  */
 public class InsertionSort<T extends Comparable<T>> extends AbstractSort<T> {
 

@@ -3,7 +3,8 @@ package com.jiehe.demo.sort;
 import java.util.Arrays;
 
 /**
- * 选择排序，时间复杂度O(n2).
+ * 选择排序，时间复杂度O(n2),空间复杂度1.
+ * <p>将它与数组的第一个元素交换位置。再从数组剩下的元素中选择出最小的元素，将它与数组的第二个元素交换位置。</p>
  */
 public class SelectionSort<T extends Comparable<T>> extends AbstractSort<T> {
 
@@ -17,11 +18,10 @@ public class SelectionSort<T extends Comparable<T>> extends AbstractSort<T> {
         }
         minNumIndex = j;
       }
-      // 每次找出剩下中的最小值放到第一个索引的位置
+      // 每次找出剩下中的最小值放到剩余元素的头部的位置
       swap(arr, i, minNumIndex);
     }
   }
-
 
   public static void main(String[] args) {
     Integer[] array = new Integer[]{6, 123, 64, 12, 756, 2, 34, 9, 564, 13, 4};

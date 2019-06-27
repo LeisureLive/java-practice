@@ -3,7 +3,8 @@ package com.jiehe.demo.sort;
 import java.util.Arrays;
 
 /**
- * 冒泡排序.
+ * 冒泡排序，时间复杂度O(N^2),空间复杂度1.
+ * <p>从左到右不断交换相邻逆序的元素，在一轮的循环之后，可以让未排序的最大元素上浮到右侧。</p>
  */
 public class BubbleSort<T extends Comparable<T>> extends AbstractSort<T> {
 
