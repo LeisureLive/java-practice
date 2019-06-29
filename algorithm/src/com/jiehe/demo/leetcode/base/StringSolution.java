@@ -1,5 +1,6 @@
-package com.jiehe.demo.array;
+package com.jiehe.demo.leetcode.base;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -109,7 +110,7 @@ public class StringSolution {
       int cur = num.charAt(x) - '0';
       if (negative) {
         //这里判断溢出的情况和第7题一样
-        if (ret < Integer.MIN_VALUE / 10|| ret == Integer.MIN_VALUE / 10 && cur > 8) {
+        if (ret < Integer.MIN_VALUE / 10 || ret == Integer.MIN_VALUE / 10 && cur > 8) {
           return Integer.MIN_VALUE;
         }
         ret = ret * 10 - cur;
@@ -121,6 +122,43 @@ public class StringSolution {
       }
     }
     return ret;
+  }
+
+  static void getNext(String s, int next[]) {
+    int pLen = s.length();
+    next[0] = -1;
+    int k = -1;
+    int j = 0;
+    while (j < pLen - 1) {
+      //p[k]表示前缀，p[j]表示后缀
+      if (k == -1 || s.charAt(j) == s.charAt(k)) {
+        ++k;
+        ++j;
+        next[j] = k;
+      } else {
+        k = next[k];
+      }
+    }
+  }
+
+  public static String longestCommonPrefix(String[] strs) {
+    if (strs.length <= 0) {
+      return "";
+    }
+    if (strs.length == 1) {
+      return strs[0];
+    }
+    Arrays.sort(strs);
+    String str1 = strs[0];
+    String str2 = strs[strs.length - 1];
+    int i = 0;
+    while (i < str1.length() && i < str2.length()) {
+      if (str1.charAt(i) != str2.charAt(i)) {
+        break;
+      }
+      i++;
+    }
+    return str1.substring(0, i);
   }
 
   public static void main(String[] args) {
@@ -139,8 +177,16 @@ public class StringSolution {
 //    String t = "nagaram";
 //    System.out.println(isAnagram(s, t));
     // 7.字符串转换整数
-    String s = "words and 987";
-    System.out.println(myAtoi(s));
+//    String s = "words and 987";
+//    System.out.println(myAtoi(s));
+    // 8.   实现strStr()
+//    String s = "ABCDABD";
+//    int[] next = new int[s.length()];
+//    getNext(s, next);
+//    System.out.println(Arrays.toString(next));
+    // 9.最长公共前缀
+    String[] strs = new String[]{"flower", "flow", "flight"};
+    System.out.println(longestCommonPrefix(strs));
   }
 
 }

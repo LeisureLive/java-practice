@@ -1,4 +1,4 @@
-package com.jiehe.demo.array;
+package com.jiehe.demo.leetcode.base;
 
 import java.util.Arrays;
 
