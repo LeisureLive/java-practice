@@ -93,10 +93,48 @@ public class ChainTableSolution {
   /**
    * 回文链表.
    */
-  public boolean isPalindrome(ListNode head) {
+  public static boolean isPalindrome(ListNode head) {
+    if (head == null || head.next == null) {
+      return true;
+    }
+    if (head.next.next == null) {
+      return head.next.val == head.val;
+    }
     // 确定链表中点
-
-    return false;
+    ListNode slow = head;
+    ListNode fast = head;
+    ListNode temp = null;
+    while (fast.next != null && fast.next.next != null) {
+      temp = slow;
+      fast = fast.next.next;
+      slow = slow.next;
+    }
+    ListNode mid;
+    if (fast.next != null) {
+      mid = slow.next;
+    } else {
+      mid = slow;
+    }
+    temp.next = null;
+    // 中点是后部分的头结点
+    ListNode prev = null;
+    // 将后半部分倒转
+    while (mid.next != null) {
+      ListNode temp2 = mid.next;
+      mid.next = prev;
+      prev = mid;
+      mid = temp2;
+    }
+    mid.next = prev;
+    // 同时遍历两端.
+    while (mid.next != null && head.next != null) {
+      if (mid.val != head.next.val) {
+        return false;
+      }
+      mid = mid.next;
+      head = head.next;
+    }
+    return true;
   }
 
   /**
@@ -126,19 +164,13 @@ public class ChainTableSolution {
 
   public static void main(String[] args) {
     ListNode listNode1 = new ListNode(1);
-    ListNode listNode2 = new ListNode(2);
-    ListNode listNode3 = new ListNode(3);
-    ListNode listNode4 = new ListNode(4);
-    ListNode listNode5 = new ListNode(5);
+    ListNode listNode2 = new ListNode(1);
+    ListNode listNode3 = new ListNode(2);
+    ListNode listNode4 = new ListNode(1);
     listNode1.next = listNode2;
     listNode2.next = listNode3;
     listNode3.next = listNode4;
-    listNode4.next = listNode5;
-    listNode5.next = null;
-    // 1.删除链表的倒数第N个节点
-    System.out.println(removeNthFromEnd(listNode1, 2));
-    // 2.反转链表
-    System.out.println(reverseList(listNode1));
+    isPalindrome(listNode1);
   }
 
 
