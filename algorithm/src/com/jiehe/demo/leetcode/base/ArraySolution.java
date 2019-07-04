@@ -1,6 +1,5 @@
 package com.jiehe.demo.leetcode.base;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -140,16 +139,79 @@ public class ArraySolution {
     return -1;
   }
 
+  /**
+   * 至少是其他数字两倍的最大数.
+   */
+  public static int dominantIndex(int[] nums) {
+    if (nums.length == 1) {
+      return 0;
+    }
+    int maxValue = nums[0];
+    int maxIndex = 0;
+    for (int i = 1; i < nums.length; i++) {
+      if (nums[i] > maxValue) {
+        maxValue = nums[i];
+        maxIndex = i;
+      }
+    }
+    for (int j = 0; j < nums.length; j++) {
+      if (2 * nums[j] > maxValue && j != maxIndex) {
+        return -1;
+      }
+    }
+    return maxIndex;
+  }
+
+  /**
+   * 对角线遍历.
+   */
+  public static int[] findDiagonalOrder(int[][] matrix) {
+    if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+      return new int[0];
+    }
+
+    int total = matrix.length * matrix[0].length;
+    int[] arr = new int[total];
+    int row = 0;
+    int col = 0;
+    for (int k = 0; k < arr.length; k++) {
+      arr[k] = matrix[row][col];
+      if ((row + col) % 2 == 0) {
+        // 偶数向右上
+        if (col == matrix[0].length - 1) {
+          row++;
+        } else if (row == 0) {
+          col++;
+        } else {
+          row--;
+          col++;
+        }
+      } else {
+        if (row == matrix.length - 1) {
+          col++;
+        } else if (col == 0) {
+          row++;
+        } else {
+          row++;
+          col--;
+        }
+      }
+    }
+    return arr;
+  }
+
 
   public static void main(String[] args) {
-    int[][] array = new int[][]{
-        {5, 1, 9, 11},
-        {2, 4, 8, 10},
-        {13, 3, 6, 7},
-        {15, 14, 12, 16}
-    };
-    rotate(array);
-    System.out.println(Arrays.toString(array));
+//    int[][] array = new int[][]{
+//        {5, 1, 9, 11},
+//        {2, 4, 8, 10},
+//        {13, 3, 6, 7},
+//        {15, 14, 12, 16}
+//    };
+//    rotate(array);
+//    System.out.println(Arrays.toString(array));
+    int[][] matrix = new int[][]{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    findDiagonalOrder(matrix);
   }
 
 }

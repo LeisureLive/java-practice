@@ -124,6 +124,109 @@ public class StringSolution {
     return ret;
   }
 
+  public static int strStr(String haystack, String needle) {
+    if (needle.length() > haystack.length()) {
+      return -1;
+    }
+    if (needle.length() == 0) {
+      return 0;
+    }
+    int i = 0;
+    while (i <= haystack.length() - needle.length()) {
+      int match = 0;
+      while (match < needle.length() && needle.charAt(match) == haystack.charAt(i + match)) {
+        match++;
+      }
+      if (match == needle.length()) {
+        return i;
+      }
+      // 此处需要考虑越界
+      if (i + needle.length() >= haystack.length()) {
+        i++;
+      } else {
+        // 匹配失败时，找对齐之后的下一个字符在needle中从右向左第一次出现的index，needle右移的距离为needle.length-index
+        char temp = haystack.charAt(i + needle.length());
+        int index = findLastIndex(temp, needle);
+        i += needle.length() - index;
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * 找到指定字符在字符串从右到左第一次出现的位置.
+   */
+  private static int findLastIndex(char cr, String str) {
+    int ret = -1;
+    for (int i = str.length() - 1; i >= 0; i++) {
+      if (str.charAt(i) == cr) {
+        return i;
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * 数组拆分 I.
+   */
+  public int arrayPairSum(int[] nums) {
+    Arrays.sort(nums);
+    int i = 0;
+    int j = 1;
+    int total = 0;
+    while (j < nums.length) {
+      total += nums[i];
+      i += 2;
+      j += 2;
+    }
+    return total;
+  }
+
+  /**
+   * 最大连续1的个数.
+   */
+  public int findMaxConsecutiveOnes(int[] nums) {
+    int i = 0;
+    int j = 0;
+    int max = 0;
+    while (i < nums.length) {
+      // 第一个1出现的位置
+      while (i < nums.length && nums[i] != 1) {
+        i++;
+        j++;
+      }
+      while (j < nums.length && nums[j] == 1) {
+        j++;
+      }
+      max = Math.max(max, j - i);
+      i = j;
+    }
+    return max;
+  }
+
+  /**
+   * 长度最小的子数组.
+   */
+  public int minSubArrayLen(int s, int[] nums) {
+    if (nums.length == 0) {
+      return 0;
+    }
+    if (nums.length == 1) {
+      return nums[0] == s ? 1 : 0;
+    }
+    int left = 0;
+    int sum = 0;
+    int minSize = Integer.MAX_VALUE;
+    for (int i = 0; i < nums.length; i++) {
+      sum += nums[i];
+      while (sum >= s) {
+        minSize = Math.min(minSize, i + 1 - left);
+        sum -= nums[left++];
+      }
+    }
+    return minSize == Integer.MAX_VALUE ? 0 : minSize;
+  }
+
   static void getNext(String s, int next[]) {
     int pLen = s.length();
     next[0] = -1;
@@ -180,10 +283,9 @@ public class StringSolution {
 //    String s = "words and 987";
 //    System.out.println(myAtoi(s));
     // 8.   实现strStr()
-//    String s = "ABCDABD";
-//    int[] next = new int[s.length()];
-//    getNext(s, next);
-//    System.out.println(Arrays.toString(next));
+    String s = "hello";
+    String needle = "ll";
+    strStr(s, needle);
     // 9.最长公共前缀
     String[] strs = new String[]{"flower", "flow", "flight"};
     System.out.println(longestCommonPrefix(strs));

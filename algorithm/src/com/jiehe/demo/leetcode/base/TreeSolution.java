@@ -1,5 +1,7 @@
 package com.jiehe.demo.leetcode.base;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,7 +58,7 @@ public class TreeSolution {
   }
 
   /**
-   * 对称二叉树.
+   * 对称二叉树(递归).
    */
   public boolean isSymmetric(TreeNode root) {
     if (root == null) {
@@ -75,36 +77,50 @@ public class TreeSolution {
     if (left.val != right.val) {
       return false;
     }
-    return isSymmer(left.left, right.right) && isSymmer(left.right, right.left);
+    return isSymmer(left.right, right.left) && isSymmer(left.left, right.right);
   }
 
   /**
-   * 二叉树的层次遍历.
+   * 对称二叉树(非递归).
    */
-  public List<List<Integer>> levelOrder(TreeNode root) {
-    Queue<TreeNode> queue = new LinkedList<>();
-    List<List<Integer>> result = new LinkedList<>();
+  public boolean isSymmetricV2(TreeNode root) {
     if (root == null) {
-      return result;
+      return true;
     }
-    queue.add(root);
-    while (!queue.isEmpty()) {
-      List<Integer> list = new LinkedList<>();
-      int cur = queue.size();
-      while (cur > 0) {
-        cur--;
-        TreeNode node = queue.poll();
-        list.add(node.val);
-        if (node.left != null) {
-          queue.add(node.left);
-        }
-        if (node.right != null) {
-          queue.add(node.right);
-        }
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.add(root.left);
+    queue.add(root.right);
+    while (!queue.isEmpty() && queue.size() >= 2) {
+      TreeNode node1 = queue.poll();
+      TreeNode node2 = queue.poll();
+      if (node1 == null && node2 == null) {
+        continue;
       }
-      result.add(list);
+      if (node1 == null || node2 == null) {
+        return false;
+      }
+      if (node1.val != node2.val) {
+        return false;
+      }
+      queue.add(node1.left);
+      queue.add(node2.right);
+      queue.add(node1.right);
+      queue.add(node2.left);
     }
-    return result;
+    return queue.isEmpty();
+  }
+
+  /**
+   * 根节点到叶子节点的路径，这条路径上所有节点值相加等于目标和.
+   */
+  public boolean hasPathSum(TreeNode root, int sum) {
+    if (root == null) {
+      return false;
+    }
+    if (root.left == null && root.right == null) {
+      return sum == root.val;
+    }
+    return hasPathSum(root.left, sum - root.val) || hasPathSum(root.right, sum - root.val);
   }
 
   /**
@@ -123,6 +139,155 @@ public class TreeSolution {
     node.left = toBST(nums, start, mid - 1);
     node.right = toBST(nums, mid + 1, end);
     return node;
+  }
+
+  /**
+   * 前序遍历(递归).
+   */
+  public List<Integer> preorderTraversal(TreeNode root) {
+    List<Integer> res = new ArrayList<>();
+    preorderTravelTree(root, res);
+    return res;
+  }
+
+  private void preorderTravelTree(TreeNode node, List<Integer> list) {
+    if (node == null) {
+      return;
+    }
+    list.add(node.val);
+    preorderTravelTree(node.left, list);
+    preorderTravelTree(node.right, list);
+  }
+
+  /**
+   * 前序遍历(非递归).
+   */
+  public List<Integer> preorderTraversalV2(TreeNode root) {
+    Deque<TreeNode> stack = new LinkedList<>();
+    List<Integer> list = new ArrayList<>();
+    TreeNode node = root;
+    while (!stack.isEmpty() || node != null) {
+      if (node != null) {
+        stack.push(node);
+        list.add(node.val);
+        node = node.left;
+      } else {
+        node = stack.pop();
+        node = node.right;
+      }
+    }
+    return list;
+  }
+
+  /**
+   * 中序遍历(递归).
+   */
+  public List<Integer> inorderTraversal(TreeNode root) {
+    List<Integer> list = new ArrayList<>();
+    inorderTravelTree(root, list);
+    return list;
+  }
+
+  private void inorderTravelTree(TreeNode node, List<Integer> list) {
+    if (node == null) {
+      return;
+    }
+    inorderTravelTree(node.left, list);
+    list.add(node.val);
+    inorderTravelTree(node.right, list);
+  }
+
+  /**
+   * 中序遍历(非递归).
+   */
+  public List<Integer> inorderTraversalV2(TreeNode root) {
+    List<Integer> list = new ArrayList<>();
+    Deque<TreeNode> stack = new LinkedList<>();
+    TreeNode node = root;
+    while (node != null || !stack.isEmpty()) {
+      if (node != null) {
+        stack.push(node);
+        node = node.left;
+      } else {
+        node = stack.pop();
+        list.add(node.val);
+        node = node.right;
+      }
+    }
+    return list;
+  }
+
+  /**
+   * 后序遍历(递归).
+   */
+  public List<Integer> postorderTraversal(TreeNode root) {
+    List<Integer> list = new ArrayList<>();
+    postorderTravelTree(root, list);
+    return list;
+  }
+
+  private void postorderTravelTree(TreeNode node, List<Integer> list) {
+    if (node == null) {
+      return;
+    }
+    postorderTravelTree(node.left, list);
+    postorderTravelTree(node.right, list);
+    list.add(node.val);
+  }
+
+  /**
+   * 后序遍历(非递归),一个记录了根右左之后的列表逆序输出.
+   */
+  public List<Integer> postorderTraversalV2(TreeNode root) {
+    Deque<TreeNode> stack = new LinkedList<>();
+    List<Integer> list = new ArrayList<>();
+    TreeNode node = root;
+    while (!stack.isEmpty() || node != null) {
+      if (node != null) {
+        stack.push(node);
+        list.add(node.val);
+        node = node.right;
+      } else {
+        node = stack.pop();
+        node = node.left;
+      }
+    }
+    Collections.reverse(list);
+    return list;
+  }
+
+  /**
+   * 二叉树的层次遍历.
+   */
+  public List<List<Integer>> levelOrder(TreeNode root) {
+    Queue<TreeNode> queue = new LinkedList<>();
+    List<List<Integer>> res = new ArrayList<>();
+    // 边缘条件，直接是一个空树
+    if (root == null) {
+      return res;
+    }
+    queue.add(root);
+    int count = 1;
+    while (!queue.isEmpty()) {
+      List<Integer> list = new ArrayList<>();
+      TreeNode node;
+      int temp = 0;
+      while (count-- > 0) {
+        node = queue.poll();
+        list.add(node.val);
+        if (node.left != null) {
+          queue.add(node.left);
+          temp++;
+        }
+        if (node.right != null) {
+          queue.add(node.right);
+          temp++;
+        }
+      }
+      res.add(list);
+      count = temp;
+    }
+    return res;
   }
 
 }
