@@ -17,35 +17,32 @@ public class MergeSort<T extends Comparable<T>> extends AbstractSort<T> {
   }
 
   private void sort(T[] arr, int start, int end) {
-    if (end <= start) {
+    if (start >= end) {
       return;
     }
-    int mid = start + (end - start) / 2;
-    // mid是前一个数组的尾部，mid+1是后一个数组的头部
+    int mid = (end - start) / 2 + start;
     sort(arr, start, mid);
     sort(arr, mid + 1, end);
     merge(arr, start, mid, end);
   }
 
   private void merge(T[] arr, int start, int mid, int end) {
+     System.arraycopy(arr, start, aux, start, end - start + 1);
+//    for (int i = start; i <= end; i++) {
+//      aux[i] = arr[i];
+//    }
     int i = start;
     int j = mid + 1;
-
-    for (int k = start; k <= end; k++) {
-      // 将数据复制到辅助数组
-      aux[k] = arr[k];
-    }
-    // 一个指针从整个数组头遍历到尾部，另外两个指针分别指向两块分数组的起始位置，依次比较，将较小的数放到遍历的位置
-    for (int k = start; k <= end; k++) {
-      // 如果某块分数组指针超过了尾部，则直接将另一个数组的元素依次遍历放到结果数组中.
+    int index = start;
+    while (i <= mid || j <= end) {
       if (i > mid) {
-        arr[k] = aux[j++];
+        arr[index++] = aux[j++];
       } else if (j > end) {
-        arr[k] = aux[i++];
-      } else if (less(arr[j], arr[i])) {
-        arr[k] = aux[j++];
+        arr[index++] = aux[i++];
+      } else if (less(aux[i], aux[j])) {
+        arr[index++] = aux[i++];
       } else {
-        arr[k] = aux[i++];
+        arr[index++] = aux[j++];
       }
     }
   }

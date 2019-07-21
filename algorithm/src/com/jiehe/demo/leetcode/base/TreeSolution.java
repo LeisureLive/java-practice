@@ -1,6 +1,7 @@
 package com.jiehe.demo.leetcode.base;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -13,7 +14,7 @@ import java.util.Queue;
  */
 public class TreeSolution {
 
-  public class TreeNode {
+  public static class TreeNode {
 
     int val;
     TreeNode left;
@@ -121,6 +122,147 @@ public class TreeSolution {
       return sum == root.val;
     }
     return hasPathSum(root.left, sum - root.val) || hasPathSum(root.right, sum - root.val);
+  }
+
+  /**
+   * 从中序与后序遍历序列构造二叉树.
+   */
+  public TreeNode buildTree(int[] inorder, int[] postorder) {
+    assert inorder.length == postorder.length;
+    if (inorder.length == 0) {
+      return null;
+    }
+    if (inorder.length == 1) {
+      return new TreeNode(inorder[0]);
+    }
+    int rootVal = postorder[postorder.length - 1];
+    TreeNode root = new TreeNode(rootVal);
+    int i = 0;
+    for (; i < inorder.length; i++) {
+      if (inorder[i] == rootVal) {
+        break;
+      }
+    }
+    root.left = buildTree(Arrays.copyOfRange(inorder, 0, i), Arrays.copyOfRange(postorder, 0, i));
+    root.right = buildTree(Arrays.copyOfRange(inorder, i + 1, inorder.length),
+        Arrays.copyOfRange(postorder, i + 1, postorder.length));
+    return root;
+  }
+
+  /**
+   * 从前序与中序遍历序列构造二叉树.
+   */
+  public static TreeNode buildTreeV2(int[] preorder, int[] inorder) {
+    return buildHelper(preorder, 0, preorder.length - 1, inorder, 0, inorder.length - 1);
+  }
+
+  private static TreeNode buildHelper(int[] preorder, int pres, int pree, int[] inorder,
+      int ins, int ine) {
+    assert pree - pres == ine - ins;
+    if (pree - pres < 0) {
+      return null;
+    }
+    if (pree - pres == 0) {
+      return new TreeNode(preorder[pres]);
+    }
+    int rootVal = preorder[pres];
+    int i = ins;
+    for (; i < ine; i++) {
+      if (inorder[i] == rootVal) {
+        break;
+      }
+    }
+    TreeNode root = new TreeNode(rootVal);
+    root.left = buildHelper(preorder, pres + 1, pres + i - ins, inorder, ins, i - 1);
+    root.right = buildHelper(preorder, pres + 1 + i - ins, pree, inorder, i + 1, ine);
+    return root;
+  }
+
+  /**
+   * 二叉树的最近公共祖先.
+   */
+  public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+    if (root == null || root.val == p.val || root.val == q.val) {
+      return root;
+    }
+    TreeNode left = lowestCommonAncestor(root.left, p, q);
+    TreeNode right = lowestCommonAncestor(root.right, p, q);
+    // 两个节点一个在当前节点左子树一个在右子树，则当前节点为最小公共祖先
+    if (left != null && right != null) {
+      return root;
+    }
+    // 如果两个节点都在左子树，则递归处理左子树；如果两个节点都在右子树，则递归处理右子树
+    return left == null ? right : left;
+  }
+
+  /**
+   * 按层遍历二叉树，用一个队列保存每一层的节点.
+   */
+  public String serialize(TreeNode root) {
+    if (root == null) {
+      return "";
+    }
+    StringBuilder builder = new StringBuilder();
+    Deque<TreeNode> queue = new LinkedList<>();
+    queue.add(root);
+    while (!queue.isEmpty()) {
+      int count = queue.size();
+      while (count-- > 0) {
+        TreeNode node = queue.removeFirst();
+        //这个优化点很重要，当遍历到null时，不要往队列写入null子节点，减少生成的字符串大小
+        if (node != null) {
+          queue.add(node.left);
+          queue.add(node.right);
+          builder.append(",").append(node.val);
+        } else {
+          builder.append(",null");
+        }
+      }
+    }
+    //删除第一个逗号
+    builder.deleteCharAt(0);
+    return builder.toString();
+  }
+
+  /**
+   * 反序列化的时候，用两个指针，第一个指向父节点，第二个指向子节点.
+   */
+  public TreeNode deserialize(String data) {
+    if (data == null || data.length() == 0) {
+      return null;
+    }
+    String[] values = data.split(",");
+    List<TreeNode> list = new LinkedList<>();
+    TreeNode head = createNode(values[0]);
+    list.add(head);
+    int rootIndex = 0;
+    int valueIndex = 1;
+    while (rootIndex < list.size()) {
+      TreeNode root = list.get(rootIndex++);
+      if (valueIndex < values.length) {
+        root.left = createNode(values[valueIndex++]);
+        root.right = createNode(values[valueIndex++]);
+      }
+      if (root.left != null) {
+        list.add(root.left);
+      }
+      if (root.right != null) {
+        list.add(root.right);
+      }
+    }
+    return head;
+  }
+
+  private TreeNode createNode(String str) {
+    if (str == null) {
+      return null;
+    }
+    if (str.equalsIgnoreCase("null")) {
+      return null;
+    } else {
+      int integer = Integer.parseInt(str);
+      return new TreeNode(integer);
+    }
   }
 
   /**

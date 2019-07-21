@@ -110,12 +110,14 @@ public class StringSolution {
       int cur = num.charAt(x) - '0';
       if (negative) {
         //这里判断溢出的情况和第7题一样
-        if (ret < Integer.MIN_VALUE / 10 || ret == Integer.MIN_VALUE / 10 && cur > 8) {
+        if (ret < Integer.MIN_VALUE / 10 || ret == Integer.MIN_VALUE / 10 && cur > Math
+            .abs(Integer.MIN_VALUE % 10)) {
           return Integer.MIN_VALUE;
         }
         ret = ret * 10 - cur;
       } else {
-        if (ret > Integer.MAX_VALUE / 10 || ret == Integer.MAX_VALUE / 10 && cur > 7) {
+        if (ret > Integer.MAX_VALUE / 10
+            || ret == Integer.MAX_VALUE / 10 && cur > Integer.MAX_VALUE % 10) {
           return Integer.MAX_VALUE;
         }
         ret = ret * 10 + cur;
@@ -124,6 +126,9 @@ public class StringSolution {
     return ret;
   }
 
+  /**
+   * 寻找子串(Sunday算法).
+   */
   public static int strStr(String haystack, String needle) {
     if (needle.length() > haystack.length()) {
       return -1;
@@ -158,7 +163,7 @@ public class StringSolution {
    */
   private static int findLastIndex(char cr, String str) {
     int ret = -1;
-    for (int i = str.length() - 1; i >= 0; i++) {
+    for (int i = str.length() - 1; i >= 0; i--) {
       if (str.charAt(i) == cr) {
         return i;
       }
@@ -205,10 +210,10 @@ public class StringSolution {
   }
 
   /**
-   * 长度最小的子数组.
+   * 长度最小的子数组（找到大于等于指定数值最短子数组，滑动窗口）.
    */
   public int minSubArrayLen(int s, int[] nums) {
-    if (nums.length == 0) {
+    if (nums.length <= 0) {
       return 0;
     }
     if (nums.length == 1) {
@@ -220,30 +225,16 @@ public class StringSolution {
     for (int i = 0; i < nums.length; i++) {
       sum += nums[i];
       while (sum >= s) {
-        minSize = Math.min(minSize, i + 1 - left);
+        minSize = Math.min(minSize, i - left + 1);
         sum -= nums[left++];
       }
     }
     return minSize == Integer.MAX_VALUE ? 0 : minSize;
   }
 
-  static void getNext(String s, int next[]) {
-    int pLen = s.length();
-    next[0] = -1;
-    int k = -1;
-    int j = 0;
-    while (j < pLen - 1) {
-      //p[k]表示前缀，p[j]表示后缀
-      if (k == -1 || s.charAt(j) == s.charAt(k)) {
-        ++k;
-        ++j;
-        next[j] = k;
-      } else {
-        k = next[k];
-      }
-    }
-  }
-
+  /**
+   * 最长公共前缀.
+   */
   public static String longestCommonPrefix(String[] strs) {
     if (strs.length <= 0) {
       return "";
@@ -262,6 +253,108 @@ public class StringSolution {
       i++;
     }
     return str1.substring(0, i);
+  }
+
+  /**
+   * 在一个字符串中找到最长的回文子串(思路：每个位置为中心，计算奇偶长度的回文子串，找到最长的).
+   */
+  public String longestPalindrome(String s) {
+    if (s == null || s.length() <= 1) {
+      return s;
+    }
+    int length = 0;
+    int index = 0;
+    for (int i = 0; i < s.length() - 1; i++) {
+      palindromeHelper(s, i, i, index, length);
+      palindromeHelper(s, i, i + 1, index, length);
+    }
+    return s.substring(index, index + length);
+  }
+
+  private void palindromeHelper(String s, int l, int r, int index, int length) {
+    while (l >= 0 && r <= s.length() - 1) {
+      if (s.charAt(l) == s.charAt(r)) {
+        l--;
+        r++;
+      } else {
+        break;
+      }
+    }
+    if (r - l - 1 > length) {
+      index = l + 1;
+      length = r - l + 1;
+    }
+  }
+
+  /**
+   * 字符串的最长回文字符列，和子串不同，字符列允许字符不连续(思路：动态规划).
+   */
+  public int longestPalindromeSubseq(String s) {
+    if (s == null || s.length() <= 0) {
+      return 0;
+    }
+    if (s.length() == 1) {
+      return 1;
+    }
+    int[][] dp = new int[s.length()][s.length()];
+    for (int i = s.length() - 1; i >= 0; i--) {
+      dp[i][i] = 1;
+      for (int j = i + 1; j < s.length(); j++) {
+        if (s.charAt(i) == s.charAt(j)) {
+          // 这里如果i j 相邻，dp[2][3] = dp[3][2] +2，dp[3][2]有默认值0
+          dp[i][j] = dp[i + 1][j - 1] + 2;
+        } else {
+          dp[i][j] = Math.max(dp[i + 1][j], dp[i][j - 1]);
+        }
+      }
+    }
+    return dp[0][s.length() - 1];
+  }
+
+  /**
+   * 最小覆盖子串(A串包含B串所有字符的最小子串).
+   */
+  public String minWindow(String s, String t) {
+    Map<Character, Integer> dicT = new HashMap<>();
+    for (int i = 0; i < t.length(); i++) {
+      int count = dicT.getOrDefault(t.charAt(i), 0);
+      dicT.put(t.charAt(i), ++count);
+    }
+    int required = dicT.size();
+    // 已对应上的字符的数量
+    int formed = 0;
+    // 表示窗口中包含的字符及对应个数.
+    Map<Character, Integer> windowMap = new HashMap<>();
+    // 表示窗口的长度，左指针位置，右指针位置.
+    int[] ans = new int[]{-1, 0, 0};
+    int l = 0;
+    int r = 0;
+    while (r < s.length()) {
+      char cr = s.charAt(r);
+      int count = windowMap.getOrDefault(cr, 0);
+      windowMap.put(cr, ++count);
+      // 两个哈希表对应字符数量相等时，formed记录数+1.
+      if (dicT.containsKey(cr) && dicT.get(cr).intValue() == windowMap.get(cr).intValue()) {
+        formed++;
+      }
+      while (l <= r && formed == required) {
+        if (ans[0] == -1 || r - l + 1 < ans[0]) {
+          ans[0] = r - l + 1;
+          ans[1] = l;
+          ans[2] = r;
+        }
+        char temp = s.charAt(l);
+        int ct = windowMap.get(temp);
+        windowMap.put(temp, --ct);
+        if (dicT.containsKey(temp) && windowMap.get(temp).intValue() < dicT.get(temp).intValue()) {
+          formed--;
+        }
+        l++;
+      }
+      r++;
+    }
+    return ans[0] == -1 ? "" : s.substring(ans[1], ans[2] + 1);
+
   }
 
   public static void main(String[] args) {
@@ -283,12 +376,13 @@ public class StringSolution {
 //    String s = "words and 987";
 //    System.out.println(myAtoi(s));
     // 8.   实现strStr()
-    String s = "hello";
-    String needle = "ll";
-    strStr(s, needle);
-    // 9.最长公共前缀
-    String[] strs = new String[]{"flower", "flow", "flight"};
-    System.out.println(longestCommonPrefix(strs));
+//    String s = "hello";
+//    String needle = "ll";
+//    strStr(s, needle);
+//    // 9.最长公共前缀
+//    String[] strs = new String[]{"flower", "flow", "flight"};
+//    System.out.println(longestCommonPrefix(strs));
+    System.out.println(Math.abs(Integer.MIN_VALUE % 10));
   }
 
 }

@@ -2,6 +2,7 @@ package com.jiehe.demo.leetcode.base;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import javafx.util.Pair;
 
 /**
  * @Author: Jiehe, leisurehejie@sina.com
@@ -24,6 +25,32 @@ public class ChainTableSolution {
     @Override
     public String toString() {
       return String.valueOf(val);
+    }
+  }
+
+  /**
+   * 交换链表相邻的节点,返回新的头结点.
+   */
+  public ListNode swapPairs(ListNode head) {
+    if (head == null || head.next == null) {
+      return head;
+    }
+    ListNode dummy = new ListNode(-1);
+    dummy.next = head;
+    swapNode(dummy, head, head.next);
+    return dummy.next;
+  }
+
+  private void swapNode(ListNode dummy, ListNode head, ListNode next) {
+    if (head == null || next == null) {
+      return;
+    }
+    ListNode temp = next.next;
+    dummy.next = next;
+    next.next = head;
+    head.next = temp;
+    if (temp != null) {
+      swapNode(head, temp, temp.next);
     }
   }
 
@@ -58,16 +85,70 @@ public class ChainTableSolution {
     return head;
   }
 
+  /**
+   * 链表反转.
+   */
   public static ListNode reverseList(ListNode head) {
+    if (head == null || head.next == null) {
+      return head;
+    }
     ListNode prev = null;
     ListNode cur = head;
+
     while (cur != null) {
       ListNode temp = cur.next;
       cur.next = prev;
       prev = cur;
       cur = temp;
     }
-    return cur;
+    return prev;
+  }
+
+  /**
+   * 反转部分链表.
+   */
+  public ListNode reverseBetween(ListNode head, int m, int n) {
+    if (head == null || head.next == null) {
+      return head;
+    }
+    // 反转部分链表反转后的头结点
+    // 反转部分链表反转后的尾结点
+    ListNode reversedTail = null;
+    ListNode cur = head;
+    // 反转部分链表反转前其头结点的前一个结点
+    ListNode reversedPre = null;
+    // 下一个要反转的节点
+    ListNode prev = null;
+    ListNode next = null;
+    int i = 1;
+    while (cur != null) {
+      if (i > n) {
+        break;
+      }
+      if (i == m - 1) {
+        reversedPre = cur;
+      }
+      if (i >= m && i <= n) {
+        if(i==m){
+          reversedTail = cur;
+        }
+        next = cur.next;
+        cur.next = prev;
+        prev = cur;
+        cur = next;
+      }else{
+        cur = cur.next;
+      }
+      i++;
+    }
+    reversedTail.next = cur;
+    if(reversedPre==null){
+      return prev;
+    }else{
+      reversedPre.next=prev;
+      return head;
+    }
+
   }
 
   /**

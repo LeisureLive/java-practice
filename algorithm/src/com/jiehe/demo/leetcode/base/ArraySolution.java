@@ -1,5 +1,6 @@
 package com.jiehe.demo.leetcode.base;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,31 +9,33 @@ public class ArraySolution {
   /**
    * 加一.
    */
-  public int[] plusOne(int[] digits) {
+  public static int[] plusOne(int[] digits) {
     for (int i = digits.length - 1; i >= 0; i--) {
-      if (digits[i] + 1 < 10) {
-        digits[i] = digits[i] + 1;
+      int sum = digits[i] + 1;
+      if (sum < 10) {
+        digits[i] = sum;
         return digits;
       }
-      digits[i] = (digits[i] + 1) % 10;
+      digits[i] = sum % 10;
     }
-    int[] result = new int[digits.length + 1];
-    System.arraycopy(digits, 0, result, 1, digits.length);
-    result[0] = 1;
-    return result;
+    int[] res = new int[digits.length + 1];
+    System.arraycopy(digits, 0, res, 1, digits.length);
+    res[0] = 1;
+    return res;
   }
 
   /**
-   * 移动零,必须在原数组上操作，不能拷贝额外的数组,尽量减少操作次数.
+   * 移动零到末尾，保持其他元素相对顺序,必须在原数组上操作，不能拷贝额外的数组,尽量减少操作次数.
    */
   public void moveZeroes(int[] nums) {
     if (nums.length <= 1) {
       return;
     }
-
+    int i = 0;
     int j = 0;
-    for (int i = 0; i < nums.length && j < nums.length; i++) {
+    while (i < nums.length && j < nums.length) {
       if (nums[i] != 0) {
+        i++;
         continue;
       }
       if (j == 0) {
@@ -41,11 +44,11 @@ public class ArraySolution {
       while (j < nums.length && nums[j] == 0) {
         j++;
       }
-      if (j == nums.length) {
-        break;
+      if (j < nums.length) {
+        swap(nums, i, j);
       }
-      swap(nums, i, j);
     }
+
   }
 
   private void swap(int[] nums, int i, int j) {
@@ -55,7 +58,7 @@ public class ArraySolution {
   }
 
   /**
-   * 两数之和.
+   * 两数之和,在数组中找出和为目标值的那 两个 整数，并返回他们的数组下标。.
    */
   public int[] twoSum(int[] nums, int target) {
     Map<Integer, Integer> map = new HashMap<>();
@@ -63,10 +66,11 @@ public class ArraySolution {
       int componet = target - nums[i];
       if (map.containsKey(componet)) {
         return new int[]{map.get(componet), i};
+      } else {
+        map.put(nums[i], i);
       }
-      map.put(nums[i], i);
     }
-    return new int[0];
+    return null;
   }
 
   /**
@@ -98,23 +102,22 @@ public class ArraySolution {
     if (prices.length <= 1) {
       return 0;
     }
+    int i = 0;
     int valley = prices[0];
     int peak = prices[0];
-    int maxProfit = 0;
-    int i = 0;
-    while (i < prices.length) {
-      while (i < prices.length - 1 && prices[i + 1] < prices[i]) {
+    int sum = 0;
+    while (i < prices.length - 1) {
+      while (i < prices.length - 1 && prices[i] >= prices[i + 1]) {
         i++;
       }
       valley = prices[i];
-      while (i < prices.length - 1 && prices[i + 1] > prices[i]) {
+      while (i < prices.length - 1 && prices[i] <= prices[i + 1]) {
         i++;
       }
       peak = prices[i];
-      maxProfit += peak - valley;
-      i++;
+      sum += peak - valley;
     }
-    return maxProfit;
+    return sum;
   }
 
   /**
@@ -200,8 +203,10 @@ public class ArraySolution {
     return arr;
   }
 
-
   public static void main(String[] args) {
+    int arr[] = new int[]{9, 9, 9};
+    int[] res = plusOne(arr);
+    System.out.println(Arrays.toString(res));
 //    int[][] array = new int[][]{
 //        {5, 1, 9, 11},
 //        {2, 4, 8, 10},
@@ -210,8 +215,8 @@ public class ArraySolution {
 //    };
 //    rotate(array);
 //    System.out.println(Arrays.toString(array));
-    int[][] matrix = new int[][]{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-    findDiagonalOrder(matrix);
+//    int[][] matrix = new int[][]{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+//    findDiagonalOrder(matrix);
   }
 
 }

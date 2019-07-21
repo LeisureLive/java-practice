@@ -10,31 +10,55 @@ public class QuickSort<T extends Comparable<T>> extends AbstractSort<T> {
 
   @Override
   public void sort(T[] arr) {
-    sort(arr, 0, arr.length - 1);
+    threeWaySort(arr, 0, arr.length - 1);
   }
 
   private void sort(T[] arr, int start, int end) {
-    if (end <= start) {
+    if (start >= end) {
       return;
     }
-    int midIndex = partition(arr, start, end);
-    sort(arr, start, midIndex);
-    sort(arr, midIndex + 1, end);
+    int mid = partition(arr, start, end);
+    sort(arr, start, mid);
+    sort(arr, mid + 1, end);
+  }
+
+  /**
+   * 三路快排，适用于重复元素较多.
+   */
+  private void threeWaySort(T arr[], int start, int end) {
+    if (start >= end) {
+      return;
+    }
+    int lt = start;
+    int gt = end;
+    int i = start + 1;
+    T val = arr[start];
+    while (i <= gt) {
+      int res = arr[i].compareTo(val);
+      if (res > 0) {
+        swap(arr, i, gt--);
+      } else if (res < 0) {
+        swap(arr, i++, lt++);
+      } else {
+        i++;
+      }
+    }
+    threeWaySort(arr, start, lt - 1);
+    threeWaySort(arr, gt + 1, end);
   }
 
   private int partition(T[] arr, int start, int end) {
+    T val = arr[start];
     int i = start;
     int j = end + 1;
-    T val = arr[i];
-    while (true) {
-      while (less(arr[++i], val) && i != end) {
+    while (i < j) {
+      while (i < end && less(arr[++i], val)) {
       }
-      while (less(val, arr[--j]) && j != start) {
+      while (j > start && less(val, arr[--j])) {
       }
-      if (i >= j) {
-        break;
+      if (i < j) {
+        swap(arr, i, j);
       }
-      swap(arr, i, j);
     }
     swap(arr, start, j);
     return j;
